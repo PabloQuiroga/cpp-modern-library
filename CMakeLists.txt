@@ -11,4 +11,6 @@ add_executable(
         src/main.cpp
         src/core/event_bus.h
         src/core/event_bus.cpp
+        tests/test_framework.h
+        tests/event_bus_test.cpp
 )
