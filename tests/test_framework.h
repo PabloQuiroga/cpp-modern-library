@@ -6,12 +6,15 @@
 #define TEST_FRAMEWORK_H
 
 #include <iostream>
-#include <string>
+
+// Variable global para rastrear fallos
+extern int total_failed_tests;
 
 #define ASSERT_TRUE(condition, message) \
     do { \
         if (!(condition)) { \
             std::cout << "  ❌ FAIL: " << message << std::endl; \
+            total_failed_tests++; \
             return false; \
         } \
     } while (0)
