@@ -6,6 +6,13 @@
 #include "test_framework.h"
 #include <string>
 #include <vector>
+#include <thread>
+#include <chrono>
+
+// Función auxiliar para esperar al worker
+void wait_for_worker() {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
 
 // TEST 1: Verificar que un suscriptor recibe el evento
 bool test_single_subscriber() {
@@ -19,6 +26,8 @@ bool test_single_subscriber() {
     });
 
     bus.publish("TEST_EVENT", std::string("Hello World"));
+
+    wait_for_worker();
 
     ASSERT_TRUE(notified == true, "Subscriber should be notified");
     ASSERT_TRUE(received_val == "Hello World", "Payload should match");
@@ -38,6 +47,8 @@ bool test_multiple_subscribers() {
 
     bus.publish("EVENT_A", std::string("Data"));
 
+    wait_for_worker();
+
     ASSERT_TRUE(count == 3, "All three subscribers should be notified");
     return true;
 }
@@ -52,6 +63,8 @@ bool test_event_isolation() {
     bus.subscribe("EVENT_B", [&](const EventPayload& p) { notified_b = true; });
 
     bus.publish("EVENT_A", std::string("Data"));
+
+    wait_for_worker();
 
     ASSERT_TRUE(notified_a == true, "Event A subscriber should be notified");
     ASSERT_TRUE(notified_b == false, "Event B subscriber should NOT be notified");
