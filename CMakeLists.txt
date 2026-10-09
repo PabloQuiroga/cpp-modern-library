@@ -9,4 +9,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(
         event_bus_app
         src/main.cpp
+        src/core/event_bus.h
+        src/core/event_bus.cpp
 )
