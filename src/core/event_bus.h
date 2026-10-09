@@ -20,11 +20,17 @@
 using EventType = std::string;
 using EventPayload = std::any;
 using Callback = std::function<void(const EventPayload&)>;
+using SubscriptionId = size_t;
 
 // Definimos la estructura de un Evento pendiente
 struct PendingEvent {
     EventType type;
     EventPayload payload;
+};
+
+struct Subscription {
+    SubscriptionId id;
+    Callback callback;
 };
 
 class EventBus {
@@ -35,12 +41,14 @@ public:
     // API Pública
     void subscribe(const EventType& type, Callback callback);
     void publish(const EventType& type, const EventPayload& payload);
-    void unsubscribe(const EventType& type, Callback callback);
+    void unsubscribe(const EventType& type, SubscriptionId id);
 
 private:
     // Gestión de suscriptores
-    std::unordered_map<EventType, std::vector<Callback>> subscribers;
+    std::unordered_map<EventType, std::vector<Subscription>> subscribers;
     std::mutex subscribers_mutex; // Protege el mapa de suscriptores
+
+    std::atomic<SubscriptionId> next_id{1};
 
     // Infraestructura Asíncrona
     std::queue<PendingEvent> event_queue;

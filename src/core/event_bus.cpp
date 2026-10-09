@@ -22,7 +22,10 @@ EventBus::~EventBus() {
 
 void EventBus::subscribe(const EventType& type, Callback callback) {
     std::lock_guard<std::mutex> lock(subscribers_mutex);
-    subscribers[type].push_back(callback);
+
+    // Generamos el ID único y creamos la estructura Subscription
+    SubscriptionId id = next_id++;
+    subscribers[type].push_back({id, callback});
 }
 
 void EventBus::publish(const EventType& type, const EventPayload& payload) {
@@ -56,13 +59,33 @@ void EventBus::worker_loop() {
         std::lock_guard<std::mutex> lock(subscribers_mutex);
         auto it = subscribers.find(event.type);
         if (it != subscribers.end()) {
-            for (const auto& callback : it->second) {
-                callback(event.payload);
+            for (const auto& sub : it->second) {
+                sub.callback(event.payload); // <--- Accedemos a .callback
             }
         }
     }
 }
 
-void EventBus::unsubscribe(const EventType& type, Callback callback) {
-    // Implementación pendiente para el Sprint de Refinamiento
+void EventBus::unsubscribe(const EventType& type, SubscriptionId id) {
+    // 1. Bloqueamos la estructura de suscriptores para evitar race conditions
+    std::lock_guard<std::mutex> lock(subscribers_mutex);
+
+    // 2. Buscamos si existe la lista de suscriptores para este tipo de evento
+    auto it = subscribers.find(type);
+    if (it == subscribers.end()) {
+        return; // El evento no existe, no hay nada que eliminar
+    }
+
+    // 3. Obtenemos la referencia al vector de suscripciones
+    auto& list = it->second;
+
+    // 4. Buscamos la suscripción con el ID dado
+    for (auto it = list.begin(); it != list.end(); ) {
+        if (it->id == id) {
+            it = list.erase(it); // erase devuelve el siguiente iterador válido
+            break; // Salimos porque el ID es único
+        } else {
+            ++it; // Solo avanzamos si no borramos nada
+        }
+    }
 }
