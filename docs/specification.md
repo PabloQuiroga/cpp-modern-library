@@ -9,7 +9,7 @@ Implementar un sistema centralizado (Event Bus) que permita a diferentes compone
 - **Suscripción a Eventos**: Los componentes deben poder registrar una función de respuesta (callback) para un identificador de evento específico.
 - **Publicación de Eventos**: El sistema debe permitir que cualquier componente dispare un evento. Cuando se publica un evento, todos los componentes suscritos a ese evento específico deben ser notificados.
 - **Cargas Útiles Genéricas (Payloads)**: Los eventos deben poder transportar datos de cualquier tipo, permitiendo que el suscriptor reciba la información asociada al evento.
-- **Anulación de Suscripción**: Los componentes deben poder dejar de escuchar un evento para evitar fugas de memoria o procesamiento innecesario.
+- **Anulación mediante token/ID**: El sistema debe proporcionar un identificador único (Token) al momento de la suscripción, el cual será requerido para procesar la anulación de la misma.
 
 ### 2.2 Restricciones de Comportamiento
 - **Desacoplamiento**: El publicador de un evento no debe conocer quiénes son los suscriptores, ni cuántos hay.

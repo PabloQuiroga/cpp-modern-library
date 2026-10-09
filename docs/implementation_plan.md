@@ -16,12 +16,12 @@
 - `Callback`: Un alias de `std::function<void(std::any)>`.
 
 ### 2.2 Interfaz de la Clase `EventBus`
-- `void subscribe(const EventType& type, Callback callback)`
-    - Agrega la función al vector asociado a la clave en el `unordered_map`.
+- `SubscriptionId subscribe(const EventType& type, Callback callback)`
+  - Genera un identificador único para la suscripción y agrega la función al vector asociado a la clave en el `unordered_map`.
 - `void publish(const EventType& type, std::any payload)`
-    - Busca el vector de callbacks y ejecuta cada función pasando el payload.
-- `void unsubscribe(const EventType& type, Callback callback)`
-    - Elimina el callback específico de la lista.
+  - Busca el vector de callbacks y ejecuta cada función pasando el payload.
+- `void unsubscribe(const EventType& type, SubscriptionId id)`
+  - Localiza la suscripción mediante el ID proporcionando la eliminación precisa del callback.
 
 ## 3. Implementación de la Asincronía
 Para cumplir con la especificación de no bloquear al publicador, implementaremos:
